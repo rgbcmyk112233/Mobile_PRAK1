@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:olah_data/Data/game_store_data.dart';
 import 'package:olah_data/test/login_page.dart';
+import 'package:olah_data/test/game_detail_page.dart'; // <-- detail page baru
 
 class HomePage extends StatelessWidget {
   final String username;
@@ -11,7 +12,6 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Home Page"),
-        // automaticallyImplyLeading: false,
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.person)),
           IconButton(
@@ -22,28 +22,33 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Text("Selamat Datang $username", style: TextStyle(fontSize: 25)),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
-                  itemBuilder: (context, Index) {
-                    return _gameStore(context, Index);
-                  },
-                  itemCount: gameList.length,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              "Selamat Datang $username",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 2 kolom
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 0.7, // proporsi card
                 ),
+                itemBuilder: (context, index) {
+                  return _gameStore(context, index);
+                },
+                itemCount: gameList.length,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -61,13 +66,49 @@ class HomePage extends StatelessWidget {
   }
 }
 
-Widget _gameStore(context, int Index) {
+Widget _gameStore(BuildContext context, int index) {
+  final game = gameList[index];
   return InkWell(
-    onTap: () {},
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => GameDetailPage(game: game)),
+      );
+    },
     child: Container(
-      padding: EdgeInsets.all(8),
-      decoration: BoxDecoration(border: Border.all()),
-      child: Column(children: [Image.network(gameList[Index].imageUrls[0])]),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(2, 2)),
+        ],
+        color: Colors.white,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+              child: Image.network(
+                game.imageUrls[0],
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              game.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }
